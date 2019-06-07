@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:estagio/ui/login.dart';
+import 'package:estagio/ui/home.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  Widget _defaultHome = Login();
+  bool logged = false;
 
-class MyApp extends StatelessWidget {
-  const MyApp({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Login', theme: ThemeData(primarySwatch: Colors.deepPurple), home: Login());
+  SharedPreferences perfs = await SharedPreferences.getInstance();
+  logged = perfs.getBool('logged');
+  if (logged) {
+    _defaultHome = Home();
   }
+  runApp(MaterialApp(
+      title: 'Estágio', theme: ThemeData(primarySwatch: Colors.deepPurple), home: _defaultHome));
 }

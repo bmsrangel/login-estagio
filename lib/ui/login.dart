@@ -1,29 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:estagio/ui/register.dart';
 import 'package:estagio/ui/home.dart';
+import 'package:estagio/services/auth.dart';
 
 class Login extends StatefulWidget {
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-  bool _success = false;
-  bool _logged = false;
-
   final _usuario = TextEditingController();
   final _senha = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _verificarLogin();
-    if (_logged) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +68,7 @@ class _LoginState extends State<Login> {
         minWidth: 200.0,
         height: 42.0,
         color: Colors.deepPurple,
-        onPressed: () => _login(),
+        onPressed: _handleLogin,
         child: Text(
           'Login',
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -129,7 +116,7 @@ class _LoginState extends State<Login> {
                 child: Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  if (_success) {
+                  if (codigo == 0) {
                     Navigator.pushReplacement(
                         context, MaterialPageRoute(builder: (context) => Home()));
                   }
@@ -140,32 +127,9 @@ class _LoginState extends State<Login> {
         });
   }
 
-  void _login() async {
-    if (_usuario.text != null) {
-      DocumentSnapshot snapshot =
-          await Firestore.instance.collection("users").document(_usuario.text).get();
-      if (snapshot.data == null) {
-        _mostrarDialogo(2);
-      } else if (snapshot.data["pass"] == _senha.text) {
-        setState(() {
-          _success = true;
-        });
-        SharedPreferences perfs = await SharedPreferences.getInstance();
-        perfs.setBool('logged', true);
-        perfs.setString('user', _usuario.text);
-        _mostrarDialogo(0);
-        _usuario.text = "";
-        _senha.text = "";
-      } else {
-        _mostrarDialogo(1);
-      }
-    }
-  }
-
-  void _verificarLogin() async {
-    SharedPreferences perfs = await SharedPreferences.getInstance();
-    setState(() {
-      _logged = perfs.getBool('logged');
-    });
+  void _handleLogin() async {
+    AuthService auth = AuthService(_usuario.text, _senha.text);
+    int _result = await auth.login();
+    _mostrarDialogo(_result);
   }
 }

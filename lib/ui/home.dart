@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:estagio/ui/login.dart';
+import 'package:estagio/services/auth.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -31,6 +32,15 @@ class _HomeState extends State<Home> {
         ],
       ),
       backgroundColor: Colors.white,
+      body: Padding(
+        padding: EdgeInsets.only(top: 150),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          Text(
+            "Você está logado!",
+            style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold),
+          ),
+        ]),
+      ),
     );
   }
 
@@ -55,20 +65,16 @@ class _HomeState extends State<Home> {
                   Navigator.of(context).pop();
                 },
               ),
-              FlatButton(
-                child: Text('Sim'),
-                onPressed: () async {
-                  SharedPreferences perfs = await SharedPreferences.getInstance();
-                  perfs.setBool('logged', false);
-                  perfs.setString('user', null);
-                  Navigator.pop(context);
-                  // Navigator.of(context).pop();
-                  Navigator.pushReplacement(
-                      context, MaterialPageRoute(builder: (context) => Login()));
-                },
-              ),
+              FlatButton(child: Text('Sim'), onPressed: _handleLogout),
             ],
           );
         });
+  }
+
+  void _handleLogout() async {
+    AuthService auth = AuthService(null, null);
+    auth.logout();
+    Navigator.pop(context);
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Login()));
   }
 }

@@ -10,6 +10,7 @@ class Registrar extends StatefulWidget {
 class _RegistrarState extends State<Registrar> {
   final _usuario = TextEditingController();
   final _senha = TextEditingController();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,48 +22,65 @@ class _RegistrarState extends State<Registrar> {
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10.0, 100.0, 10.0, 0.0),
-              child: TextFormField(
-                maxLines: 1,
-                autofocus: false,
-                controller: _usuario,
-                decoration: InputDecoration(
-                    hintText: 'Usuário',
-                    icon: Icon(
-                      Icons.account_circle,
-                      color: Colors.deepPurple,
-                    )),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
-              child: TextFormField(
-                maxLines: 1,
-                autofocus: false,
-                controller: _senha,
-                obscureText: true,
-                decoration: InputDecoration(
-                    hintText: 'Senha', icon: Icon(Icons.lock, color: Colors.deepPurple)),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 10.0),
-              child: MaterialButton(
-                child: Text(
-                  "Registrar",
-                  style: TextStyle(color: Colors.white, fontSize: 20.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10.0, 100.0, 10.0, 0.0),
+                child: TextFormField(
+                  maxLines: 1,
+                  autofocus: false,
+                  controller: _usuario,
+                  decoration: InputDecoration(
+                      hintText: 'Usuário',
+                      icon: Icon(
+                        Icons.account_circle,
+                        color: Colors.deepPurple,
+                      )),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Informe um usuário válido';
+                    }
+                  },
                 ),
-                onPressed: () => _registrarUsuario(),
-                color: Colors.deepPurple,
-                minWidth: 200.0,
-                height: 42.0,
-                elevation: 5.0,
               ),
-            )
-          ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0.0),
+                child: TextFormField(
+                  maxLines: 1,
+                  autofocus: false,
+                  controller: _senha,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                      hintText: 'Senha', icon: Icon(Icons.lock, color: Colors.deepPurple)),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return "Este campo não pode ser vazio";
+                    }
+                  },
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: MaterialButton(
+                  child: Text(
+                    "Registrar",
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      _registrarUsuario();
+                    }
+                  },
+                  color: Colors.deepPurple,
+                  minWidth: 200.0,
+                  height: 42.0,
+                  elevation: 5.0,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
